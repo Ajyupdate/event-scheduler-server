@@ -58,7 +58,8 @@ router.post("", (request, response) => {
 router.get("/:id", async (request, response) => {
     const { id } = request.params;
     const requestedDate = request.query.date;
-    console.log(requestedDate);
+    // console.log(id + '1')
+    // console.log(requestedDate)
     try {
         const product = await Tasks.find({ owner: id, date: requestedDate });
         response.json({

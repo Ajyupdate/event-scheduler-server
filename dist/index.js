@@ -3,9 +3,16 @@ import Users from './models/users.js';
 import Tasks from './routes/tasks.js';
 import UserRoute from './routes/auth.js';
 import express from 'express';
+import cors from 'cors';
 const app = express();
+const corsOptions = {
+    origin: "*",
+};
+app.use(cors(corsOptions));
 const port = 3001;
 app.use(express.json());
+// app.use(cors({ origin: 'http://localhost:3000' }));
+app.use(cors());
 app.use('/auth', UserRoute);
 app.use('/tasks', Tasks);
 app.get('/', (req, res) => {
