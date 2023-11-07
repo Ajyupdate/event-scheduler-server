@@ -81,10 +81,7 @@ router.get("/:id", async(request, response) =>{
     try{
         const product = await Tasks.find({owner: id, date: requestedDate})
        
-        response.json({
-            status: "SUCCESS",
-            data: product
-        })
+        response.json(product)
     }
     catch(err) {
         response.json({
