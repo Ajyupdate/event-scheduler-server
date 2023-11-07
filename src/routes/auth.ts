@@ -8,7 +8,9 @@ import { v4 as uuidv4 } from 'uuid';
 
 
 
-
+router.get("/signin", (request, response) =>{
+    response.send("good job")
+})
 // let transporter = nodemailer.createTransport({
 //   service: "gmail",
 //   auth:{
@@ -25,136 +27,136 @@ import { v4 as uuidv4 } from 'uuid';
 //   }
 // })
 
-router.post('/signin', (req, res) =>{
-  let {email, password} = req.body;
-  email = email.trim(); 
-  password = password.trim();
+// router.post('/signin', (req, res) =>{
+//   let {email, password} = req.body;
+//   email = email.trim(); 
+//   password = password.trim();
 
-  if(email == "" || password == ""){
-    res.json({
-      status: "FAILED",
-      message: "Empty credentials supplied"
-    })
-  } else{
-    Users.find({email})
-      .then((data: { password: string }[]) => {
-        if(data.length){
-          const hashedPassword = data[0].password;
-          bcrypt.compare(password, hashedPassword).then(result => {
-            if(result){
-              res.json({
-                status: "SUCCESS",
-                message: "Signin Successful",
-                data:data
-              })
-            } else{
-              res.json({
-                status: "FAILED",
-                message: "Invalid password",
+//   if(email == "" || password == ""){
+//     res.json({
+//       status: "FAILED",
+//       message: "Empty credentials supplied"
+//     })
+//   } else{
+//     Users.find({email})
+//       .then((data: { password: string }[]) => {
+//         if(data.length){
+//           const hashedPassword = data[0].password;
+//           bcrypt.compare(password, hashedPassword).then(result => {
+//             if(result){
+//               res.json({
+//                 status: "SUCCESS",
+//                 message: "Signin Successful",
+//                 data:data
+//               })
+//             } else{
+//               res.json({
+//                 status: "FAILED",
+//                 message: "Invalid password",
                 
-              })
-            }
-          })
-          .catch(err => {
-            res.json({
-              status: "FAILED",
-              message: "An error occurred while comparing passwords",
+//               })
+//             }
+//           })
+//           .catch(err => {
+//             res.json({
+//               status: "FAILED",
+//               message: "An error occurred while comparing passwords",
               
-            })
-          })
-        } else {
-          res.json({
-            status: "FAILED",
-            message: "Invalid Credentials",
+//             })
+//           })
+//         } else {
+//           res.json({
+//             status: "FAILED",
+//             message: "Invalid Credentials",
             
-          })
-        }
-      })
-      .catch(err => {
-        res.json({
-          status: "FAILED",
-          message: "Invalid Credentials",
+//           })
+//         }
+//       })
+//       .catch(err => {
+//         res.json({
+//           status: "FAILED",
+//           message: "Invalid Credentials",
           
-        })
-      })
-  }
-})
+//         })
+//       })
+//   }
+// })
 
-router.post("/signup", (req, res) => {
-  let {name, email, password} = req.body;
-  name = name.trim();
-  email = email.trim()
-  password = password.trim()
+// router.post("/signup", (req, res) => {
+//   let {name, email, password} = req.body;
+//   name = name.trim();
+//   email = email.trim()
+//   password = password.trim()
 
-  if(name == "" || email == "" || password == ""){
-    res.json({
-      status: "Failed",
-      message: "Empty input fields!"
-    })
-  } else if (!/^[a-zA-Z ]*$/.test(name)){
-    res.json({
-      status:"Failed",
-      message: "Invalid name entered"
-    })
-  } else if(!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)){
-    res.json({
-      status: "Failed",
-      message: "Invalid email entered"
-    })
-  } else if(password.length < 8){
-    res.json({
-      status: "Failed",
-      message: "Password is too short"
-    })
-  } else {
-    Users.find({email}).then(result => {
-      if(result.length){
-        res.json({
-          status: "Failed",
-          message: "email already exist"
-        })
-      } else{
+//   if(name == "" || email == "" || password == ""){
+//     res.json({
+//       status: "Failed",
+//       message: "Empty input fields!"
+//     })
+//   } else if (!/^[a-zA-Z ]*$/.test(name)){
+//     res.json({
+//       status:"Failed",
+//       message: "Invalid name entered"
+//     })
+//   } else if(!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)){
+//     res.json({
+//       status: "Failed",
+//       message: "Invalid email entered"
+//     })
+//   } else if(password.length < 8){
+//     res.json({
+//       status: "Failed",
+//       message: "Password is too short"
+//     })
+//   } else {
+//     Users.find({email}).then(result => {
+//       if(result.length){
+//         res.json({
+//           status: "Failed",
+//           message: "email already exist"
+//         })
+//       } else{
 
-        const saltRounds = 10;
-        bcrypt.hash(password, saltRounds).then(hashedPassword => {
-          const newUser = new Users({
-            name,
-            email,
-            password: hashedPassword,
-          })
+//         const saltRounds = 10;
+//         bcrypt.hash(password, saltRounds).then(hashedPassword => {
+//           const newUser = new Users({
+//             name,
+//             email,
+//             password: hashedPassword,
+//           })
 
           
-          newUser.save().then(result => {
-            res.json({
-              status: "SUCCESS",
-              message: "New User added successfully",
-              data: result,
-            })
-          })
-          .catch(err => {
-            res.json({
-              status: "FAILED",
-              message: "An error while saving user"
-            })
-          })
-        })
-        .catch(err => {
-          res.json({
-            status: "FAILED",
-            message: "An error while hashing password"
-          })
-        })
+//           newUser.save().then(result => {
+//             res.json({
+//               status: "SUCCESS",
+//               message: "New User added successfully",
+//               data: result,
+//             })
+//           })
+//           .catch(err => {
+//             res.json({
+//               status: "FAILED",
+//               message: "An error while saving user"
+//             })
+//           })
+//         })
+//         .catch(err => {
+//           res.json({
+//             status: "FAILED",
+//             message: "An error while hashing password"
+//           })
+//         })
         
-      }
-    }).catch(err => {
-      console.log(err);
-      res.json({
-        status: "Failed",
-        message: "An error occured"
-      })
-    })
-  }
-})
+//       }
+//     }).catch(err => {
+//       console.log(err);
+//       res.json({
+//         status: "Failed",
+//         message: "An error occured"
+//       })
+//     })
+//   }
+// })
 
 // Initialize Nodemailer with your email service credentials
 // const transporter = nodemailer.createTransport({
