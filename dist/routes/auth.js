@@ -9,7 +9,7 @@ import Users from '../models/users.js';
 const router = Router();
 const currentUrl = "http://localhost:3001/";
 router.get("/signin", (request, response) => {
-    response.send("good job");
+    response.send("good jobbb");
 });
 const transporter = nodemailer.createTransport({
     service: "gmail",
