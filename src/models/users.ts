@@ -1,7 +1,7 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Document, Schema } from 'mongoose';
 
 // Define an interface to represent the data structure
-interface IUserData extends Document {
+export interface IUserData extends Document {
   name: string;
   email: string;
   password: string;
@@ -23,10 +23,10 @@ const dataSchema = new Schema<IUserData>({
     type: String,
     required: true,
   },
-  // verified: {
-  //   type: Boolean,
-  //   required: true,
-  // },
+  verified: {
+    type: Boolean,
+    required: true,
+  },
   
 });
 

@@ -13,10 +13,10 @@ const dataSchema = new Schema({
         type: String,
         required: true,
     },
-    // verified: {
-    //   type: Boolean,
-    //   required: true,
-    // },
+    verified: {
+        type: Boolean,
+        required: true,
+    },
 });
 // Create a Mongoose model based on the schema
 const Users = mongoose.model('users', dataSchema);
