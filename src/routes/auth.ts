@@ -69,7 +69,7 @@ router.post('/signin', (req, res) =>{
     })
   } else{
     Users.find({email})
-      .then((data: IUserData[]) => {
+      .then(async (data: IUserData[]) => {
         if(data.length){
 
           if(!data[0].verified){
@@ -79,7 +79,7 @@ router.post('/signin', (req, res) =>{
             })
           } else{
             const hashedPassword = data[0].password;
-            bcrypt.compare(password, hashedPassword)
+            await bcrypt.compare(password, hashedPassword)
             .then(result => {
               if(result){
                 res.json({
@@ -151,7 +151,7 @@ router.post("/signup", (req, res) => {
     })
   } else {
 
-    Users.find({email}).then(result => {
+    Users.find({email}).then(async result => {
       if(result.length){
         res.json({
           status: "Failed",
@@ -160,7 +160,7 @@ router.post("/signup", (req, res) => {
       } else{
 
         const saltRounds = 10;
-        bcrypt.hash(password, saltRounds).then(hashedPassword => {
+        await bcrypt.hash(password, saltRounds).then(hashedPassword => {
           const newUser = new Users({
             name,
             email,
