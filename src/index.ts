@@ -1,9 +1,10 @@
+import cors from 'cors';
+import express from 'express';
+
 import { connectToDatabase } from "./connection/db.js";
 import Users from './models/users.js';
+import UserRoute from './routes/auth.js';
 import Tasks from './routes/tasks.js';
-import UserRoute from './routes/auth.js'
-import express from 'express'
-import cors from 'cors'
 const app = express()
 
 const corsOptions = {
@@ -19,6 +20,7 @@ app.use(cors())
 app.use('/auth', UserRoute)
 app.use('/tasks', Tasks)
 app.get('/', (req, res) => {
+  
     res.send('Hello, Express with TypeScriptttt and MongoDB!');
   });
 
