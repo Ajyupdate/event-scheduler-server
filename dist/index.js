@@ -1,9 +1,9 @@
+import cors from 'cors';
+import express from 'express';
 import { connectToDatabase } from "./connection/db.js";
 import Users from './models/users.js';
-import Tasks from './routes/tasks.js';
 import UserRoute from './routes/auth.js';
-import express from 'express';
-import cors from 'cors';
+import Tasks from './routes/tasks.js';
 const app = express();
 const corsOptions = {
     origin: "*",
