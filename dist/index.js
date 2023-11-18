@@ -1,9 +1,11 @@
-import cors from 'cors';
-import express from 'express';
+import cors from "cors";
+import express from "express";
+import dotenv from "dotenv";
 import { connectToDatabase } from "./connection/db.js";
-import Users from './models/users.js';
-import UserRoute from './routes/auth.js';
-import Tasks from './routes/tasks.js';
+import Users from "./models/users.js";
+import UserRoute from "./routes/auth.js";
+import Tasks from "./routes/tasks.js";
+dotenv.config();
 const app = express();
 const corsOptions = {
     origin: "*",
@@ -13,18 +15,18 @@ const port = 3001;
 app.use(express.json());
 // app.use(cors({ origin: 'http://localhost:3000' }));
 app.use(cors());
-app.use('/auth', UserRoute);
-app.use('/tasks', Tasks);
-app.get('/', (req, res) => {
-    res.send('Hello, Express with TypeScriptttt and MongoDB!');
+app.use("/auth", UserRoute);
+app.use("/tasks", Tasks);
+app.get("/", (req, res) => {
+    res.send("Hello, Express with TypeScriptttt and MongoDB!");
 });
-app.get('/reviews', async (req, res) => {
+app.get("/reviews", async (req, res) => {
     try {
         const reviews = await Users.find();
         res.json(reviews);
     }
     catch (error) {
-        res.status(500).json({ error: 'An error occurred while fetching data' });
+        res.status(500).json({ error: "An error occurred while fetching data" });
     }
 });
 connectToDatabase()
