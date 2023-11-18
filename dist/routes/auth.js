@@ -40,7 +40,6 @@ router.get("/sendmails", async (req, res, next) => {
 export async function verifyBuyerToken(req, res, next) {
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];
-    console.log(token);
     if (!token) {
         return res.status(401).send({
             error: "You are unauthorized to perform this operation.",
@@ -92,6 +91,7 @@ router.post("/signin", (req, res) => {
                                 status: "SUCCESS",
                                 message: "Signin Successful",
                                 token: token,
+                                data: data[0],
                             });
                             //   } else {
                             //     res.status(400);
