@@ -1,25 +1,25 @@
-
-import { Router, response } from "express";
-import Users from "../models/users.js";
+import { Router } from "express";
 import Tasks from "../models/tasks.js";
-
-const router = Router()
+import { verifyBuyerToken } from "./auth.js";
+const router = Router();
 
 router.post("", (request, response) => {
-   
-    const { title, startTime, endTime, date, owner, completed } = request.body;    
-    if (title && startTime && endTime) {
-        const originalDate: Date = new Date(date);
-        const options: Intl.DateTimeFormatOptions = {
-          weekday: "short",
-          year: "numeric",
-          month: "short",
-          day: "2-digit",
-        };
-        
-        const formattedDate: string = originalDate.toLocaleDateString("en-US", options);
-        
-        //  Create a new Date object for the current date
+  const { title, startTime, endTime, date, owner, completed } = request.body;
+  if (title && startTime && endTime) {
+    const originalDate: Date = new Date(date);
+    const options: Intl.DateTimeFormatOptions = {
+      weekday: "short",
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
+    };
+
+    const formattedDate: string = originalDate.toLocaleDateString(
+      "en-US",
+      options
+    );
+
+    //  Create a new Date object for the current date
     const currentDate = new Date();
     let taskDate;
     // Check if the formattedDate matches today's date
@@ -38,84 +38,83 @@ router.post("", (request, response) => {
     const currentDay = currentDate.getDate();
 
     if (
-        formattedYear === currentYear &&
-        formattedMonth === currentMonth &&
-        formattedDay === currentDay
-      ) {
-        taskDate = "Today";
-      } else {
-        taskDate = formattedDate;
-      }
+      formattedYear === currentYear &&
+      formattedMonth === currentMonth &&
+      formattedDay === currentDay
+    ) {
+      taskDate = "Today";
+    } else {
+      taskDate = formattedDate;
+    }
 
-      const newTodo = new Tasks ({
-        title,
-        startTime,
-        endTime,
-        date: formattedDate,
-        owner,
-        completed,
-      })
+    const newTodo = new Tasks({
+      title,
+      startTime,
+      endTime,
+      date: formattedDate,
+      owner,
+      completed,
+    });
 
-      newTodo.save().then(result => {
+    newTodo
+      .save()
+      .then((result) => {
         response.json({
-            status: "SUCCESS",
-            message: "New Task added successfully",
-            data: result,
-        })
+          status: "SUCCESS",
+          message: "New Task added successfully",
+          data: result,
+        });
       })
-      .catch(err => {
+      .catch((err) => {
         response.json({
           status: "FAILED",
-          message: "An error while saving user"
-        })
-      })
+          message: "An error while saving user",
+        });
+      });
+  }
+});
 
+router.get("/:id", verifyBuyerToken, async (request, response) => {
+  const { id } = request.params;
+  const requestedDate = request.query.date;
+  // console.log(id + '1')
+  // console.log(requestedDate)
+  try {
+    const product = await Tasks.find({ owner: id, date: requestedDate });
+
+    response.json(product);
+  } catch (err) {
+    response.json({
+      status: "FAILED",
+      message: "Something went wrong",
+    });
+  }
+});
+
+router.patch("/:id", async (request, response) => {
+  const { id } = request.params;
+  const updatedData = request.body;
+
+  try {
+    const updatedTask = await Tasks.findByIdAndUpdate(
+      id,
+      updatedData,
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedTask) {
+      return response.status(404).json({ message: "Task not founddd" });
     }
-})
 
-router.get("/:id", async(request, response) =>{
-    const {id} = request.params;
-    const requestedDate = request.query.date;
-    // console.log(id + '1')
-    // console.log(requestedDate)
-    try{
-        const product = await Tasks.find({owner: id, date: requestedDate})
-       
-        response.json(product)
-    }
-    catch(err) {
-        response.json({
-            status: "FAILED",
-            message: "Something went wrong",
-            
-        })
-    }
-})
-
-router.patch("/:id", async(request, response) =>{
-    const {id} = request.params
-    const updatedData = request.body;
-
-    try{
-        const updatedTask = await Tasks.findByIdAndUpdate(
-            id,
-            updatedData,
-            { new: true } // Return the updated document
-        );
-
-        if (!updatedTask) {
-            return response.status(404).json({ message: "Task not founddd" });
-          }
-      
-          response.json({
-            status: "SUCCESS",
-            data: updatedTask
-        })
-    } catch (error) {
-        response.status(500).json({ message: "Error updating product" });
-        console.log(error);
-      }
-})
+    response.json({
+      status: "SUCCESS",
+      data: updatedTask,
+    });
+  } catch (error) {
+    response.status(500).json({ message: "Error updating product" });
+    console.log(error);
+  }
+});
 
 router.delete("/:id", async (request, response) => {
   const { id } = request.params;

@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import { Router } from "express";
+import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
 import otpGenerator from "otp-generator";
 import path from "path";
@@ -36,22 +37,27 @@ router.get("/sendmails", async (req, res, next) => {
     }
   });
 });
-// let transporter = nodemailer.createTransport({
-//   service: "gmail",
-//   auth:{
-//     user: "ajibadeemmanuel58@gmail.com",
-//     pass: ""
-//   }
-// })
 
-// transporter.verify((error, success) => {
-//   if(error) {
-//     console.log(error)
-//   }else{
-//     console.log("Ready for messages")
-//   }
-// })
+export async function verifyBuyerToken(req, res, next) {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
 
+  if (!token) {
+    return res.status(401).send({
+      error: "You are unauthorized to perform this operation.",
+    });
+  }
+
+  try {
+    const buyer = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    req.buyer = buyer;
+    next();
+  } catch (error) {
+    return res.status(403).send({
+      error: "Your session has expired. Please log in again.",
+    });
+  }
+}
 router.post("/signin", (req, res) => {
   let { email, password } = req.body;
   email = email.trim();
@@ -73,23 +79,38 @@ router.post("/signin", (req, res) => {
             });
           } else {
             const hashedPassword = data[0].password;
-            await bcrypt
+            bcrypt
               .compare(password, hashedPassword)
+
               .then((result) => {
                 if (result) {
+                  const serializeUser = { name: email };
+
+                  // Generate JWT token
+                  const token = jwt.sign(
+                    serializeUser,
+                    process.env.ACCESS_TOKEN_SECRET,
+                    {
+                      expiresIn: "3m",
+                    }
+                  );
+
                   res.json({
                     status: "SUCCESS",
                     message: "Signin Successful",
-                    data: data,
+                    token: token,
+                    data: data[0],
                   });
-                } else {
-                  res.json({
-                    status: "FAILED",
-                    message: "Invalid password",
-                  });
+                  //   } else {
+                  //     res.status(400);
+                  //     res.json({
+                  //       status: "FAILED",
+                  //       message: "Invalid password",
+                  //     });
                 }
               })
               .catch((err) => {
+                res.status(500);
                 res.json({
                   status: "FAILED",
                   message: "An error occurred while comparing passwords",
@@ -106,7 +127,7 @@ router.post("/signin", (req, res) => {
       .catch((err) => {
         res.json({
           status: "FAILED",
-          message: "Invalid Credentials",
+          message: "Email doesn't exist",
         });
       });
   }

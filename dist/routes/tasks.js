@@ -1,5 +1,6 @@
 import { Router } from "express";
 import Tasks from "../models/tasks.js";
+import { verifyBuyerToken } from "./auth.js";
 const router = Router();
 router.post("", (request, response) => {
     const { title, startTime, endTime, date, owner, completed } = request.body;
@@ -40,22 +41,24 @@ router.post("", (request, response) => {
             owner,
             completed,
         });
-        newTodo.save().then(result => {
+        newTodo
+            .save()
+            .then((result) => {
             response.json({
                 status: "SUCCESS",
                 message: "New Task added successfully",
                 data: result,
             });
         })
-            .catch(err => {
+            .catch((err) => {
             response.json({
                 status: "FAILED",
-                message: "An error while saving user"
+                message: "An error while saving user",
             });
         });
     }
 });
-router.get("/:id", async (request, response) => {
+router.get("/:id", verifyBuyerToken, async (request, response) => {
     const { id } = request.params;
     const requestedDate = request.query.date;
     // console.log(id + '1')
@@ -82,7 +85,7 @@ router.patch("/:id", async (request, response) => {
         }
         response.json({
             status: "SUCCESS",
-            data: updatedTask
+            data: updatedTask,
         });
     }
     catch (error) {
