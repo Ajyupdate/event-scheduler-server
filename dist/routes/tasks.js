@@ -1,6 +1,6 @@
 import { Router } from "express";
 import Tasks from "../models/tasks.js";
-import { verifyBuyerToken } from "./auth.js";
+import { verifyUserToken } from "./auth.js";
 const router = Router();
 router.post("", (request, response) => {
     const { title, startTime, endTime, date, owner, completed } = request.body;
@@ -58,19 +58,23 @@ router.post("", (request, response) => {
         });
     }
 });
-router.get("/:id", verifyBuyerToken, async (request, response) => {
+router.get("/:id", verifyUserToken, async (request, response) => {
     const { id } = request.params;
     const requestedDate = request.query.date;
+    console.log(id);
+    console.log(requestedDate);
     // console.log(id + '1')
     // console.log(requestedDate)
     try {
         const product = await Tasks.find({ owner: id, date: requestedDate });
+        console.log(product);
         response.json(product);
     }
     catch (err) {
+        response.status(500);
         response.json({
             status: "FAILED",
-            message: "Something went wrong",
+            message: "Internal Server error",
         });
     }
 });
