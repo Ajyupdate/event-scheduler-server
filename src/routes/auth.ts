@@ -38,13 +38,14 @@ router.get("/sendmails", async (req, res, next) => {
   });
 });
 
-export async function verifyBuyerToken(req, res, next) {
+export async function verifyUserToken(req, res, next) {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
 
   if (!token) {
     return res.status(401).send({
-      error: "You are unauthorized to perform this operation.",
+      status: "Failed",
+      message: "You are unauthorized to perform this operation.",
     });
   }
 
@@ -54,7 +55,8 @@ export async function verifyBuyerToken(req, res, next) {
     next();
   } catch (error) {
     return res.status(403).send({
-      error: "Your session has expired. Please log in again.",
+      status: "Failed",
+      message: "Your session has expired. Please log in again.",
     });
   }
 }
@@ -91,22 +93,22 @@ router.post("/signin", (req, res) => {
                     serializeUser,
                     process.env.ACCESS_TOKEN_SECRET,
                     {
-                      expiresIn: "3m",
+                      expiresIn: "5m",
                     }
                   );
 
                   res.json({
                     status: "SUCCESS",
-                    message: "Signin Successful",
+                    message: "Sign in Successful",
                     token: token,
                     data: data[0],
                   });
-                  //   } else {
-                  //     res.status(400);
-                  //     res.json({
-                  //       status: "FAILED",
-                  //       message: "Invalid password",
-                  //     });
+                } else {
+                  res.status(400);
+                  res.json({
+                    status: "FAILED",
+                    message: "Invalid password",
+                  });
                 }
               })
               .catch((err) => {
@@ -157,6 +159,12 @@ router.post("/signup", (req, res) => {
     res.json({
       status: "Failed",
       message: "Password is too short",
+    });
+  } else if (Users.find({ name })) {
+    res.status(409);
+    res.json({
+      status: "Failed",
+      message: "Username already existed, choose another one",
     });
   } else {
     Users.find({ email })
@@ -318,6 +326,7 @@ const sendVerificationEmail = ({ _id, email }, res) => {
 router.post("/verify-otp", (req, res) => {
   let { userId, uniqueString } = req.body;
   userId = userId.trim();
+
   uniqueString = uniqueString.trim();
 
   UsersVerification.find({ userId, uniqueString })
@@ -353,6 +362,7 @@ router.post("/verify-otp", (req, res) => {
             });
         } else {
           Users.updateOne({ _id: userId }, { verified: true })
+
             .then(() => {
               res.send({
                 status: "Success",
