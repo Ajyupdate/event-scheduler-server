@@ -43,7 +43,7 @@ export async function verifyUserToken(req, res, next) {
     if (!token) {
         return res.status(401).send({
             status: "Failed",
-            message: "You are unauthorized to perform this operation.",
+            message: "You are unauthorized to perform this operation. Log in to gain full access",
         });
     }
     try {
@@ -87,7 +87,7 @@ router.post("/signin", (req, res) => {
                             const serializeUser = { name: email };
                             // Generate JWT token
                             const token = jwt.sign(serializeUser, process.env.ACCESS_TOKEN_SECRET, {
-                                expiresIn: "5m",
+                                expiresIn: "2m",
                             });
                             res.json({
                                 status: "SUCCESS",
@@ -208,7 +208,6 @@ router.post("/signup", (req, res) => {
             }
         })
             .catch((err) => {
-            console.log(err);
             res.json({
                 status: "Failed",
                 message: "An error occured",
@@ -398,7 +397,6 @@ router.get("/verify/:userId/:uniqueString", (req, res) => {
                     });
                 })
                     .catch((error) => {
-                    console.log(error);
                     let message = "An error occured while checking for existing user verification record";
                     res.redirect(`/user/verified/error=true&message=${message}`);
                 });
@@ -418,13 +416,11 @@ router.get("/verify/:userId/:uniqueString", (req, res) => {
                                 res.sendFile(path.join(__dirname, "./../views/verified.html"));
                             })
                                 .catch((error) => {
-                                console.log(error);
                                 let message = "An error occured while finalizing successfull verification";
                                 res.redirect(`/user/verified/error=true&message=${message}`);
                             });
                         })
                             .catch((error) => {
-                            console.log(error);
                             let message = "An error occured while updating user record to show verified";
                             res.redirect(`/user/verified/error=true&message=${message}`);
                         });
@@ -447,7 +443,6 @@ router.get("/verify/:userId/:uniqueString", (req, res) => {
         }
     })
         .catch((error) => {
-        console.log(error);
         let message = "An error occured while checking for existing user verification record";
         res.redirect(`/user/verified/error=true&message=${message}`);
     });
