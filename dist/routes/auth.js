@@ -87,7 +87,7 @@ router.post("/signin", (req, res) => {
                             const serializeUser = { name: email };
                             // Generate JWT token
                             const token = jwt.sign(serializeUser, process.env.ACCESS_TOKEN_SECRET, {
-                                expiresIn: "2m",
+                                expiresIn: "5h",
                             });
                             res.json({
                                 status: "SUCCESS",

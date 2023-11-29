@@ -94,7 +94,7 @@ router.post("/signin", (req, res) => {
                     serializeUser,
                     process.env.ACCESS_TOKEN_SECRET,
                     {
-                      expiresIn: "2m",
+                      expiresIn: "5h",
                     }
                   );
 
