@@ -123,7 +123,7 @@ router.post("/signin", (req, res) => {
             .catch((err) => {
             res.json({
                 status: "FAILED",
-                message: "Email doesn't exist",
+                message: "Something went wrong, check your internet connection",
             });
         });
     }
@@ -155,6 +155,7 @@ router.post("/signup", (req, res) => {
         });
     }
     else if (Users.find({ name })) {
+        console.log(Users.find({ name }).count);
         res.status(409);
         res.json({
             status: "Failed",
