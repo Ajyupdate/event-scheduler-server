@@ -133,6 +133,7 @@ router.post("/signup", (req, res) => {
     name = name.trim();
     email = email.trim();
     password = password.trim();
+    console.log(name, email, password);
     if (name == "" || email == "" || password == "") {
         res.status(400);
         res.json({
@@ -152,14 +153,6 @@ router.post("/signup", (req, res) => {
         res.json({
             status: "Failed",
             message: "Password is too short",
-        });
-    }
-    else if (Users.find({ name })) {
-        console.log(Users.find({ name }).count);
-        res.status(409);
-        res.json({
-            status: "Failed",
-            message: "Username already existed, choose another one",
         });
     }
     else {
